@@ -9,10 +9,11 @@ namespace ecommerceBackEnd.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductController(IProductService productService) : ControllerBase
+    public class ProductController(IProductService productService, IProductRepo productRepo) : ControllerBase
     {
         private readonly IProductService _productService = productService;
-        
+        private readonly IProductRepo _productRepo = productRepo;
+
         [HttpGet("GetProduct/{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
@@ -46,9 +47,25 @@ namespace ecommerceBackEnd.Controllers
         }
 
         [HttpPost("UploadProduct")]
-        public async Task<ActionResult> UploadProduct(ProductEntry entry)
+        public async Task<ActionResult> UploadProduct([FromForm] ProductEntry entry)
         {
-            var result = _productService.
+            string result =  await _productService.UploadProduct(entry);
+            if (result == "Data inserted successfully")
+            {
+                return StatusCode(200, result);
+            }
+            return BadRequest(result);
+        }
+
+        [HttpGet("checku/{productname}")]
+        public async Task<ActionResult<string>> CheckU(string productname)
+        {
+            string result = await _productRepo.CheckForProductNameUniqueness(productname);
+            if(result == null || result == "")
+            {
+                return Ok("that is unique");
+            }
+            return Ok("That is not unique");
         }
     }
 }

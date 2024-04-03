@@ -9,6 +9,7 @@ namespace ecommerceBackEnd.Repository.Interfaces
         public Task<IEnumerable<SmallProduct>> GetHomePageProducts();
         public Task<Product> GetProduct(int id);
         public Task<string> CheckForProductNameUniqueness(string name);
-        public Task UploadPicture(IFormFile formFile);
+        public Task<string> UploadPicture(IFormFile formFile);
+        public Task UploadProduct(ProductEntry entry);
     }
 }

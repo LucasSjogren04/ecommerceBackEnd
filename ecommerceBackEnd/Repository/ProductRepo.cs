@@ -1,8 +1,10 @@
-﻿using Dapper;
+﻿using Azure.Storage.Blobs;
+using Dapper;
 using ecommerceBackEnd.Models;
 using ecommerceBackEnd.Repository.Interfaces;
 using System.Buffers;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Reflection;
 
@@ -65,7 +67,7 @@ namespace ecommerceBackEnd.Repository
                 using IDbConnection db = _dBContext.GetConnection();
                 DynamicParameters dynamicParameters = new();
                 dynamicParameters.Add("@name", name);
-                string productName = await db.QueryFirstAsync<string>("CheckForProductNameUniqueness", dynamicParameters, commandType: CommandType.StoredProcedure);
+                string? productName = await db.QueryFirstOrDefaultAsync<string>("CheckForProductNameUniqueness", dynamicParameters, commandType: CommandType.StoredProcedure);
                 return productName;
             }
             catch (Exception ex)
@@ -78,20 +80,52 @@ namespace ecommerceBackEnd.Repository
         {
             try
             {
-                // Generate a unique name for the image
-                var imageName = $"{Guid.NewGuid()}{Path.GetExtension(formFile.FileName)}";
+                string connectionString = _dBContext.GetBlobConnection();
+                string containerName = "pictures";
 
-                // Upload image to Azure Blob Storage
-                var blob = _blobContainer.GetBlockBlobReference(imageName);
-                await blob.UploadFromStreamAsync(formFile.OpenReadStream());
+                // Create a BlobServiceClient object which will be used to create a container client
+                BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
 
-                // Return the URL of the uploaded image
-                var imageUrl = blob.Uri.ToString();
-                return Ok(new { imageUrl });
+                // Create the container and return a container client object
+                BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+
+                // Get a reference to a blob
+                string fileName = Path.GetFileName(formFile.FileName);
+                BlobClient blobClient = containerClient.GetBlobClient(fileName);
+
+                // Open a stream to the file content
+                using (Stream stream = formFile.OpenReadStream())
+                {
+                    // Upload the file to blob storage
+                    await blobClient.UploadAsync(stream, true);
+                }
+
+                // Return the uploaded filename
+                return fileName;
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                throw;
+
+            }
+        }
+
+        public async Task UploadProduct(ProductEntry entry)
+        {
+            try
+            {
+                using IDbConnection db = _dBContext.GetConnection();
+                DynamicParameters dynamicParameters = new();
+                dynamicParameters.Add("@ProductName", entry.ProductName);
+                dynamicParameters.Add("@ProductPrice", entry.ProductPrice);
+                dynamicParameters.Add("@ProductDescription", entry.ProductDescription);
+                dynamicParameters.Add("@ProductPictureURL", entry.Picture.FileName);
+                await db.ExecuteAsync("UploadProduct", dynamicParameters, commandType: CommandType.StoredProcedure);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }

@@ -52,7 +52,11 @@ namespace ecommerceBackEnd.Service
             {
                 return "ProductName has to be unique";
             }
+            string fileName = await _productRepo.UploadPicture(entry.Picture);
 
+            await _productRepo.UploadProduct(entry);
+
+            return ("Data inserted successfully");
 
         }
     }
