@@ -5,5 +5,6 @@ namespace ecommerceBackEnd.Repository.Interfaces
     public interface IDBContext
     {
         SqlConnection GetConnection();
+        public string GetBlobConnection();
     }
 }

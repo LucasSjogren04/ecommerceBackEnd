@@ -10,5 +10,10 @@ namespace ecommerceBackEnd.Repository
         {
             return new SqlConnection(_configuration);
         }
+        private readonly string? _blobConfiguration = configuration.GetConnectionString("BlobConnection");
+        public string GetBlobConnection()
+        {
+            return new string(_blobConfiguration);
+        }
     }
 }
