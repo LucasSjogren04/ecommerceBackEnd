@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Dapper;
 using ecommerceBackEnd.Models;
 using ecommerceBackEnd.Repository.Interfaces;
@@ -93,11 +94,17 @@ namespace ecommerceBackEnd.Repository
                 string fileName = Path.GetFileName(formFile.FileName);
                 BlobClient blobClient = containerClient.GetBlobClient(fileName);
 
+                // Set the content type
+                var blobHttpHeaders = new BlobHttpHeaders
+                {
+                    ContentType = formFile.ContentType // Use the content type provided by the formFile
+                };
+
                 // Open a stream to the file content
                 using (Stream stream = formFile.OpenReadStream())
                 {
-                    // Upload the file to blob storage
-                    await blobClient.UploadAsync(stream, true);
+                    // Upload the file to blob storage with specified content type
+                    await blobClient.UploadAsync(stream, new BlobUploadOptions { HttpHeaders = blobHttpHeaders });
                 }
 
                 // Return the uploaded filename
