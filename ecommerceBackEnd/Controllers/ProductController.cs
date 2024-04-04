@@ -49,12 +49,30 @@ namespace ecommerceBackEnd.Controllers
         [HttpPost("UploadProduct")]
         public async Task<ActionResult> UploadProduct([FromForm] ProductEntry entry)
         {
-            string result =  await _productService.UploadProduct(entry);
+            string result = await _productService.UploadProduct(entry);
             if (result == "Data inserted successfully")
             {
                 return StatusCode(200, result);
             }
             return BadRequest(result);
+        }
+
+
+        [HttpDelete("DeleteProduct")]
+        public async Task<ActionResult> DeleteProduct(int id, string fileName)
+        {
+            string result = await _productService.DeleteProduct(id, fileName);
+            if(result != "Product data deleted")
+            {
+                return StatusCode(403, result);
+            }
+            return Ok(result);
+        }
+        [HttpGet("GetListOfProductsForAdmin")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetListOfAllProducts()
+        {
+            var products = await _productRepo.GetListOfAllProducts();
+            return Ok(products);
         }
 
         [HttpGet("checku/{productname}")]

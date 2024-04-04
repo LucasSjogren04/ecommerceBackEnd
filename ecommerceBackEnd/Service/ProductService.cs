@@ -7,6 +7,19 @@ namespace ecommerceBackEnd.Service
     public class ProductService(IProductRepo productRepo) : IProductService
     {
         private readonly IProductRepo _productRepo = productRepo;
+
+        public async Task<string> DeleteProduct(int id, string fileName)
+        {
+            bool fileDeleted =  await _productRepo.DeletePicture(fileName);
+            if (!fileDeleted)
+            {
+                return "File not found";
+            }
+            await _productRepo.DeleteProduct(id);
+            return "Product data deleted";
+            
+        }
+
         public async Task<IEnumerable<SmallProduct>> GetHomePageProducts()
         {
             var products = await _productRepo.GetHomePageProducts();

@@ -76,7 +76,51 @@ namespace ecommerceBackEnd.Repository
                 throw new Exception(ex.Message);
             }
         }
+        public async Task UploadProduct(ProductEntry entry)
+        {
+            try
+            {
+                using IDbConnection db = _dBContext.GetConnection();
+                DynamicParameters dynamicParameters = new();
+                dynamicParameters.Add("@ProductName", entry.ProductName);
+                dynamicParameters.Add("@ProductPrice", entry.ProductPrice);
+                dynamicParameters.Add("@ProductDescription", entry.ProductDescription);
+                dynamicParameters.Add("@ProductPictureURL", entry.Picture.FileName);
+                await db.ExecuteAsync("UploadProduct", dynamicParameters, commandType: CommandType.StoredProcedure);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
+        public async Task DeleteProduct(int id)
+        {
+            try
+            {
+                using IDbConnection db = _dBContext.GetConnection();
+                DynamicParameters dynamicParameters = new();
+                dynamicParameters.Add("@Id", id);
+                await db.ExecuteAsync("DeleteProduct", dynamicParameters, commandType: CommandType.StoredProcedure);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task<IEnumerable<Product>> GetListOfAllProducts()
+        {
+            try
+            {
+                using IDbConnection db = _dBContext.GetConnection();
+                IEnumerable<Product> productName = await db.QueryAsync<Product>("GetListOfAllProducts", commandType: CommandType.StoredProcedure);
+                return productName;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
         public async Task<string> UploadPicture(IFormFile formFile)
         {
             try
@@ -118,21 +162,30 @@ namespace ecommerceBackEnd.Repository
             }
         }
 
-        public async Task UploadProduct(ProductEntry entry)
+        
+        public async Task<bool> DeletePicture(string fileName)
         {
             try
             {
-                using IDbConnection db = _dBContext.GetConnection();
-                DynamicParameters dynamicParameters = new();
-                dynamicParameters.Add("@ProductName", entry.ProductName);
-                dynamicParameters.Add("@ProductPrice", entry.ProductPrice);
-                dynamicParameters.Add("@ProductDescription", entry.ProductDescription);
-                dynamicParameters.Add("@ProductPictureURL", entry.Picture.FileName);
-                await db.ExecuteAsync("UploadProduct", dynamicParameters, commandType: CommandType.StoredProcedure);
+                string connectionString = _dBContext.GetBlobConnection();
+                string containerName = "pictures";
+
+                // Create a BlobServiceClient object which will be used to create a container client
+                BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
+
+                // Create the container and return a container client object
+                BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+
+                // Get a reference to the blob to be deleted
+                BlobClient blobClient = containerClient.GetBlobClient(fileName);
+
+                // Delete the blob
+                return await blobClient.DeleteIfExistsAsync();
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                Console.WriteLine($"An error occurred while deleting the picture: {ex.Message}");
+                throw;
             }
         }
     }
