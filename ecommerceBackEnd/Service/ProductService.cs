@@ -34,6 +34,11 @@ namespace ecommerceBackEnd.Service
 
         public async Task<IEnumerable<SmallProduct>> SearchForProducts(string searchValue)
         {
+            if(searchValue == "")
+            {
+                var product = await _productRepo.GetHomePageProducts();
+                return product;
+            }
             var products = await _productRepo.SearchForProducts(searchValue);
             return products;
         }

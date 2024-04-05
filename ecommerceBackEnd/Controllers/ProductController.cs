@@ -24,8 +24,9 @@ namespace ecommerceBackEnd.Controllers
             }
             return Ok(product);
         }
-        [HttpGet("SearchForProducts/{searchValue}")]
-        public async Task<ActionResult<IEnumerable<SmallProduct>>> SearchForProducts(string searchValue)
+
+        [HttpGet("SearchForProducts/{searchValue?}")]
+        public async Task<ActionResult<IEnumerable<SmallProduct>>> SearchForProducts(string searchValue = "")
         {
             var products = await _productService.SearchForProducts(searchValue);
             if (products == null)
