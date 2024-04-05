@@ -38,6 +38,36 @@ namespace ecommerceBackEnd.Service
             return products;
         }
 
+        public async Task<string> UpdateProduct(FullProduct fullProduct)
+        {
+            string exists = await _productRepo.CheckForProductNameUniquenessOnUpdate(fullProduct.ProductName, fullProduct.ProductId);
+            if (exists != null)
+            {
+                return "Product name not unique";
+            }
+
+            //Check if user wants to update the picture
+            if (fullProduct.Picture != null)
+            {
+                Product productToUpdate = await _productRepo.GetProduct(fullProduct.ProductId);
+                if(productToUpdate == null || productToUpdate.ProductPictureURL == null)
+                {
+                    return "The product marked for updating was not found";
+                }
+                //Delete old picture
+                await _productRepo.DeletePicture(productToUpdate.ProductPictureURL);
+                //Upload new picture
+                await _productRepo.UploadPicture(fullProduct.Picture);
+
+                //Update database data
+                await _productRepo.UpdateProductWithPicture(fullProduct);
+                return "Product updated successfully";
+            }
+            
+            await _productRepo.UpdateProduct(fullProduct);
+            return "Product updated successfully without changing the picture";
+        }
+
         public async Task<string> UploadProduct(ProductEntry entry)
         {
             //Checks for valid inputs
@@ -45,9 +75,9 @@ namespace ecommerceBackEnd.Service
             {
                 return "Request did not include ProductName";
             }
-            if (entry.ProductPrice == 0.0M || entry.ProductPrice > 1e19M + 1)
+            if (entry.ProductPrice == 0.0M || entry.ProductPrice >= 1e19M + 1)
             {
-                return "Request did not include ProductPrice or it was 0 or it was larger than 1e19M + 1";
+                return "Request did not include ProductPrice or it was 0 or it was larger than or equal to 1e19M + 1";
             }
             if (entry.ProductDescription == null || entry.ProductDescription == "")
             {

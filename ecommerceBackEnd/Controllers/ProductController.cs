@@ -68,11 +68,23 @@ namespace ecommerceBackEnd.Controllers
             }
             return Ok(result);
         }
-        [HttpGet("GetListOfProductsForAdmin")]
+
+        [HttpGet("GetListOfAllProducts")]
         public async Task<ActionResult<IEnumerable<Product>>> GetListOfAllProducts()
         {
             var products = await _productRepo.GetListOfAllProducts();
             return Ok(products);
+        }
+
+        [HttpPut("UpdateProduct")]
+        public async Task<ActionResult> UpdateProduct([FromForm] FullProduct fullProduct)
+        {
+            string result = await _productService.UpdateProduct(fullProduct);
+            if(result == "The product marked for updating was not found" || result == "Product name not unique")
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
 
         [HttpGet("checku/{productname}")]

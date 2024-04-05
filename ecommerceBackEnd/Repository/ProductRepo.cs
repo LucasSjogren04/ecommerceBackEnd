@@ -68,14 +68,31 @@ namespace ecommerceBackEnd.Repository
                 using IDbConnection db = _dBContext.GetConnection();
                 DynamicParameters dynamicParameters = new();
                 dynamicParameters.Add("@name", name);
-                string? productName = await db.QueryFirstOrDefaultAsync<string>("CheckForProductNameUniqueness", dynamicParameters, commandType: CommandType.StoredProcedure);
-                return productName;
+                string? product = await db.QueryFirstOrDefaultAsync<string>("CheckForProductNameUniqueness", dynamicParameters, commandType: CommandType.StoredProcedure);
+                return product;
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<string> CheckForProductNameUniquenessOnUpdate(string productName, int productId)
+        {
+            try
+            {
+                using IDbConnection db = _dBContext.GetConnection();
+                DynamicParameters dynamicParameters = new();
+                dynamicParameters.Add("@ProductName", productName);
+                dynamicParameters.Add("@ProductId", productId);
+                string? product = await db.QueryFirstOrDefaultAsync<string>("CheckForProductNameUniquenessOnUpdate", dynamicParameters, commandType: CommandType.StoredProcedure);
+                return product;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task UploadProduct(ProductEntry entry)
         {
             try
@@ -93,7 +110,42 @@ namespace ecommerceBackEnd.Repository
                 throw new Exception(ex.Message);
             }
         }
+        public async Task UpdateProduct(FullProduct fullProduct)
+        {
+            try
+            {
+                using IDbConnection db = _dBContext.GetConnection();
+                DynamicParameters dynamicParameters = new();
+                dynamicParameters.Add("@ProductId", fullProduct.ProductId);
+                dynamicParameters.Add("@ProductName", fullProduct.ProductName);
+                dynamicParameters.Add("@ProductPrice", fullProduct.ProductPrice);
+                dynamicParameters.Add("@ProductDescription", fullProduct.ProductDescription);
+                await db.ExecuteAsync("UpdateProduct", dynamicParameters, commandType: CommandType.StoredProcedure);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
+        public async Task UpdateProductWithPicture(FullProduct fullProduct)
+        {
+            try
+            {
+                using IDbConnection db = _dBContext.GetConnection();
+                DynamicParameters dynamicParameters = new();
+                dynamicParameters.Add("@ProductId", fullProduct.ProductId);
+                dynamicParameters.Add("@ProductName", fullProduct.ProductName);
+                dynamicParameters.Add("@ProductPrice", fullProduct.ProductPrice);
+                dynamicParameters.Add("@ProductDescription", fullProduct.ProductDescription);
+                dynamicParameters.Add("@ProductPictureURL", fullProduct.Picture.FileName);
+                await db.ExecuteAsync("UpdateProductWithPicture", dynamicParameters, commandType: CommandType.StoredProcedure);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
         public async Task DeleteProduct(int id)
         {
             try
