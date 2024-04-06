@@ -6,5 +6,6 @@
         public decimal ProductPrice { get; set; }
         public string? ProductDescription { get; set; }
         public IFormFile? Picture { get; set; }
+        public string? ProductURLSlug { get; set; }
     }
 }

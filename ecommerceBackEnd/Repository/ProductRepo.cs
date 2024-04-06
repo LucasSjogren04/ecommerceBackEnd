@@ -93,6 +93,39 @@ namespace ecommerceBackEnd.Repository
             }
         }
 
+        public async Task<string> CheckForProductURLSlugUniqueness(string slug)
+        {
+            try
+            {
+                using IDbConnection db = _dBContext.GetConnection();
+                DynamicParameters dynamicParameters = new();
+                dynamicParameters.Add("@slug", slug);
+                string? product = await db.QueryFirstOrDefaultAsync<string>("CheckForProductURLSlugUniqueness", dynamicParameters, commandType: CommandType.StoredProcedure);
+                return product;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<string> CheckForProductURLSlugUniquenessOnUpdate(string slug, int productId)
+        {
+            try
+            {
+                using IDbConnection db = _dBContext.GetConnection();
+                DynamicParameters dynamicParameters = new();
+                dynamicParameters.Add("@slug", slug);
+                dynamicParameters.Add("@ProductId", productId);
+                string? product = await db.QueryFirstOrDefaultAsync<string>("CheckForProductURLSlugUniquenessOnUpdate", dynamicParameters, commandType: CommandType.StoredProcedure);
+                return product;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task UploadProduct(ProductEntry entry)
         {
             try
@@ -103,6 +136,7 @@ namespace ecommerceBackEnd.Repository
                 dynamicParameters.Add("@ProductPrice", entry.ProductPrice);
                 dynamicParameters.Add("@ProductDescription", entry.ProductDescription);
                 dynamicParameters.Add("@ProductPictureURL", entry.Picture.FileName);
+                dynamicParameters.Add("@ProductURLSlug", entry.ProductURLSlug);
                 await db.ExecuteAsync("UploadProduct", dynamicParameters, commandType: CommandType.StoredProcedure);
             }
             catch (Exception ex)
@@ -120,6 +154,7 @@ namespace ecommerceBackEnd.Repository
                 dynamicParameters.Add("@ProductName", fullProduct.ProductName);
                 dynamicParameters.Add("@ProductPrice", fullProduct.ProductPrice);
                 dynamicParameters.Add("@ProductDescription", fullProduct.ProductDescription);
+                dynamicParameters.Add("@ProductURLSlug", fullProduct.ProductURLSlug);
                 await db.ExecuteAsync("UpdateProduct", dynamicParameters, commandType: CommandType.StoredProcedure);
             }
             catch (Exception ex)
@@ -139,6 +174,7 @@ namespace ecommerceBackEnd.Repository
                 dynamicParameters.Add("@ProductPrice", fullProduct.ProductPrice);
                 dynamicParameters.Add("@ProductDescription", fullProduct.ProductDescription);
                 dynamicParameters.Add("@ProductPictureURL", fullProduct.Picture.FileName);
+                dynamicParameters.Add("@ProductURLSlug", fullProduct.ProductURLSlug);
                 await db.ExecuteAsync("UpdateProductWithPicture", dynamicParameters, commandType: CommandType.StoredProcedure);
             }
             catch (Exception ex)
