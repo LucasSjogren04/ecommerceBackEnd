@@ -7,6 +7,7 @@ namespace ecommerceBackEnd.Service
         public Task<IEnumerable<SmallProduct>> SearchForProducts(string searchValue);
         public Task<IEnumerable<SmallProduct>> GetHomePageProducts();
         public Task<Product> GetProduct(int id);
+        public Task<Product?> GetProductbySlug(string slug);
         public Task<string> UploadProduct(ProductEntry entry);
         public Task<string> DeleteProduct(int id, string fileName);
         public Task<string> UpdateProduct(FullProduct fullProduct);

@@ -30,6 +30,22 @@ namespace ecommerceBackEnd.Repository
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<Product> GetProductbySlug(string slug)
+        {
+            try
+            {
+                using IDbConnection db = _dBContext.GetConnection();
+                DynamicParameters dynamicParameters = new();
+                dynamicParameters.Add("@slug", slug);
+                Product? product = await db.QueryFirstOrDefaultAsync<Product>("GetProductbySlug", dynamicParameters, commandType: CommandType.StoredProcedure);
+                return product;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         //used for home page
         public async Task<IEnumerable<SmallProduct>> GetHomePageProducts()
         {

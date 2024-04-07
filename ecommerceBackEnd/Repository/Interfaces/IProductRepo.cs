@@ -8,6 +8,7 @@ namespace ecommerceBackEnd.Repository.Interfaces
         public Task<IEnumerable<SmallProduct>> SearchForProducts(string searchValue);
         public Task<IEnumerable<SmallProduct>> GetHomePageProducts();
         public Task<Product> GetProduct(int id);
+        public Task<Product> GetProductbySlug(string slug);
         public Task<IEnumerable<Product>> GetListOfAllProducts();
         public Task<string> CheckForProductNameUniqueness(string name);
         public Task<string> CheckForProductURLSlugUniqueness(string name);

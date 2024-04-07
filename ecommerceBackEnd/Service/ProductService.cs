@@ -33,6 +33,16 @@ namespace ecommerceBackEnd.Service
             return product;
         }
 
+        public async Task<Product?> GetProductbySlug(string slug)
+        {
+            if(slug == null)
+            {
+                return null;
+            }
+            Product product = await _productRepo.GetProductbySlug(slug);
+            return product;
+        }
+
         public async Task<IEnumerable<SmallProduct>> SearchForProducts(string searchValue)
         {
             Console.WriteLine("SearchForProducts");

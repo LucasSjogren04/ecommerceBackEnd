@@ -25,6 +25,20 @@ namespace ecommerceBackEnd.Controllers
             return Ok(product);
         }
 
+        [HttpGet("GetProductbySlug/{slug}")]
+        public async Task<ActionResult<Product>> GetProductbySlug(string slug)
+        {
+            Console.WriteLine("searched for " + slug);
+            var product = await _productService.GetProductbySlug(slug);
+            Console.WriteLine("returned" + product);
+            if (product == null)
+            {
+                return BadRequest();
+            }
+
+            return Ok(product);
+        }
+
         [HttpGet("SearchForProducts/{searchValue?}")]
         public async Task<ActionResult<IEnumerable<SmallProduct>>> SearchForProducts(string searchValue = "")
         {
