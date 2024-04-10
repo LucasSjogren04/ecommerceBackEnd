@@ -9,15 +9,24 @@ namespace ecommerceBackEnd.Service
     {
         private readonly IProductRepo _productRepo = productRepo;
 
-        public async Task<string> DeleteProduct(int id, string fileName)
-        {
-            bool fileDeleted =  await _productRepo.DeletePicture(fileName);
-            if (!fileDeleted)
+        public async Task<string> DeleteProduct(int id)
+        { 
+            Product product = await _productRepo.GetProduct(id);
+            if(product == null)
             {
-                return "File not found";
+                return "product not found";
             }
-            await _productRepo.DeleteProduct(id);
-            return "Product data deleted";
+            if(product.ProductPictureURL != null)
+            {
+                await _productRepo.DeleteProduct(id);
+                bool fileDeleted = await _productRepo.DeletePicture(product.ProductPictureURL);
+                if (!fileDeleted)
+                {
+                    return "Data was deleted but the picture was not found and thus not deleted";
+                }
+                return "Product data deleted";
+            }
+            return "Data was deleted but the picture was not found and thus not deleted";
             
         }
 
@@ -45,7 +54,6 @@ namespace ecommerceBackEnd.Service
 
         public async Task<IEnumerable<SmallProduct>> SearchForProducts(string searchValue)
         {
-            Console.WriteLine("SearchForProducts");
             if(searchValue == "")
             {
                 var product = await _productRepo.GetHomePageProducts();

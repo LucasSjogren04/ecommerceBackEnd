@@ -42,6 +42,7 @@ namespace ecommerceBackEnd.Controllers
         [HttpGet("SearchForProducts/{searchValue?}")]
         public async Task<ActionResult<IEnumerable<SmallProduct>>> SearchForProducts(string searchValue = "")
         {
+            Console.WriteLine("Searching");
             var products = await _productService.SearchForProducts(searchValue);
             if (products == null)
             {
@@ -73,13 +74,17 @@ namespace ecommerceBackEnd.Controllers
         }
 
 
-        [HttpDelete("DeleteProduct")]
-        public async Task<ActionResult> DeleteProduct(int id, string fileName)
+        [HttpDelete("DeleteProduct{id}")]
+        public async Task<ActionResult> DeleteProduct(int id)
         {
-            string result = await _productService.DeleteProduct(id, fileName);
-            if(result != "Product data deleted")
+            string result = await _productService.DeleteProduct(id);
+            if(result != "Product data deleted" && result != "Data was deleted but the picture was not found and thus not deleted")
             {
                 return StatusCode(403, result);
+            }
+            if(result == "Data was deleted but the picture was not found and thus not deleted")
+            {
+                return StatusCode(300, result);
             }
             return Ok(result);
         }
@@ -94,6 +99,7 @@ namespace ecommerceBackEnd.Controllers
         [HttpPut("UpdateProduct")]
         public async Task<ActionResult> UpdateProduct([FromForm] FullProduct fullProduct)
         {
+            Console.WriteLine("Updating");
             string result = await _productService.UpdateProduct(fullProduct);
             if(result == "The product marked for updating was not found" || result == "Product name not unique")
             {

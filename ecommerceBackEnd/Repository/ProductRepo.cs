@@ -269,6 +269,10 @@ namespace ecommerceBackEnd.Repository
         
         public async Task<bool> DeletePicture(string fileName)
         {
+            if(fileName == null)
+            {
+                return false;
+            }
             try
             {
                 string connectionString = _dBContext.GetBlobConnection();
