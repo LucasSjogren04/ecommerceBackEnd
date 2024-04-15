@@ -8,5 +8,6 @@
         public string? ProductDescription { get; set; }
         public string? ProductPictureURL { get; set; }
         public string? ProductURLSlug { get; set; }
+        public string? SKU { get; set; }
     }
 }

@@ -153,6 +153,7 @@ namespace ecommerceBackEnd.Repository
                 dynamicParameters.Add("@ProductDescription", entry.ProductDescription);
                 dynamicParameters.Add("@ProductPictureURL", entry.Picture.FileName);
                 dynamicParameters.Add("@ProductURLSlug", entry.ProductURLSlug);
+                dynamicParameters.Add("@SKU", entry.SKU);
                 await db.ExecuteAsync("UploadProduct", dynamicParameters, commandType: CommandType.StoredProcedure);
             }
             catch (Exception ex)
@@ -171,6 +172,7 @@ namespace ecommerceBackEnd.Repository
                 dynamicParameters.Add("@ProductPrice", fullProduct.ProductPrice);
                 dynamicParameters.Add("@ProductDescription", fullProduct.ProductDescription);
                 dynamicParameters.Add("@ProductURLSlug", fullProduct.ProductURLSlug);
+                dynamicParameters.Add("@SKU", fullProduct.SKU);
                 await db.ExecuteAsync("UpdateProduct", dynamicParameters, commandType: CommandType.StoredProcedure);
             }
             catch (Exception ex)
@@ -191,6 +193,7 @@ namespace ecommerceBackEnd.Repository
                 dynamicParameters.Add("@ProductDescription", fullProduct.ProductDescription);
                 dynamicParameters.Add("@ProductPictureURL", fullProduct.Picture.FileName);
                 dynamicParameters.Add("@ProductURLSlug", fullProduct.ProductURLSlug);
+                dynamicParameters.Add("@SKU", fullProduct.SKU);
                 await db.ExecuteAsync("UpdateProductWithPicture", dynamicParameters, commandType: CommandType.StoredProcedure);
             }
             catch (Exception ex)

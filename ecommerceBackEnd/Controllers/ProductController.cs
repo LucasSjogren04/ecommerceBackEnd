@@ -28,7 +28,6 @@ namespace ecommerceBackEnd.Controllers
         [HttpGet("GetProductbySlug/{slug}")]
         public async Task<ActionResult<Product>> GetProductbySlug(string slug)
         {
-            Console.WriteLine("searched for " + slug);
             var product = await _productService.GetProductbySlug(slug);
             Console.WriteLine("returned" + product);
             if (product == null)
@@ -42,12 +41,13 @@ namespace ecommerceBackEnd.Controllers
         [HttpGet("SearchForProducts/{searchValue?}")]
         public async Task<ActionResult<IEnumerable<SmallProduct>>> SearchForProducts(string searchValue = "")
         {
-            Console.WriteLine("Searching");
+            Console.WriteLine("searched for: ", searchValue.ToString());
             var products = await _productService.SearchForProducts(searchValue);
             if (products == null)
             {
                 return BadRequest();
             }
+            Console.WriteLine("returned " + products.Count() + " products");
             return Ok(products);
         }
 
